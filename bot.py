@@ -5,20 +5,18 @@ from aiogram.client.bot import DefaultBotProperties
 
 API_TOKEN = "ТВОЙ_ТОКЕН_БОТА"
 
-# Список каналів для пропозицій (посилання)
+# Список каналів 
 CHANNELS = [
     {"name": "Канал 1", "link": "https://t.me/example1"},
     {"name": "Канал 2", "link": "https://t.me/example2"},
 ]
 
-# Ініціалізація бота під aiogram 3.10+
 bot = Bot(
     token=API_TOKEN,
     default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 )
 dp = Dispatcher()
 
-# --- Функція перевірки підписок ---
 async def check_subscriptions(user_id):
     for ch in CHANNELS:
         try:
@@ -29,14 +27,12 @@ async def check_subscriptions(user_id):
             return False
     return True
 
-# --- Обробка заявки на вступ ---
 @dp.chat_join_request()
 async def join_request_handler(event: types.ChatJoinRequest):
     user_id = event.from_user.id
     chat_title = event.chat.title
 
     try:
-        # Формуємо текст з усіма каналами
         text = f"👋 Привіт!\nДякуємо за заявку у канал <b>{chat_title}</b>!\n\n"
         text += "Перш ніж отримати доступ, підпишись на наші канали:\n"
         for ch in CHANNELS:
@@ -49,15 +45,7 @@ async def join_request_handler(event: types.ChatJoinRequest):
     except Exception as e:
         print(f"Не вдалося написати користувачу {user_id}: {e}")
 
-    # ❌ НЕ схвалюємо заявку автоматично
-    # Якщо хочеш схвалювати після перевірки підписок, можна:
-    # if await check_subscriptions(user_id):
-    #     await event.approve()
-    # else:
-    #     await event.decline()
 
-
-# --- Старт бота ---
 async def main():
     print("Бот запущений...")
     await dp.start_polling(bot)
